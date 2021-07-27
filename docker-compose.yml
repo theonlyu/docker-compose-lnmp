@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+    nginx:
+      build: ./nginx 
+      container_name: nginx_compose
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - "$PWD/nginx/conf.d:/etc/nginx/conf.d"
+        - "$PWD/www:/usr/share/nginx/html"
+      depends_on:
+        - "php"
+        - "mysql"
+      networks:
+        - lnmp
+    php:
+      build: ./php
+      container_name: php_compose
+      volumes:
+        - "$PWD/www:/var/www/html"
+      ports:
+        - "9000:9000"
+      networks:
+        - lnmp
+
+    mysql:
+      image: mysql:5.7.34
+      container_name: mysql_compose
+      ports:
+        - "3306:3306"
+      volumes:
+        - "$PWD/mysql/conf.d/my.cnf:/etc/mysql/conf.d/mysql.cnf"
+      networks:
+        - lnmp
+      command: --character-set-server=utf8
+      environment:
+        MYSQL_ROOT_PASSWORD: 123456
+        MYSQL_DATABASE: wordpress
+        MYSQL_USER: lnmp
+        MYSQL_PASSWORD: lnmp123
+
+networks: 
+    lnmp:
